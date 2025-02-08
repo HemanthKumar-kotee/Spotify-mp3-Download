@@ -1,6 +1,4 @@
-#from requests_html import HTMLSession
 from pathlib import Path
-#from lxml import etree
 import youtube_dl
 import os
 import re
@@ -24,9 +22,10 @@ def DownloadSongsfromId(ids):
         print('Download folder exists')
 
     ydl_opts = {
-        'ffmpeg_location': r"C:\Users\kotee\AppData\Local\Programs\Python\Python311\Scripts\ffmpeg.exe",
+
+        'ffmpeg_location': r"D:\ffmpeg-7.1-essentials_build\bin\ffmpeg.exe",
         'format':'bestaudio/best',
-        'postProcessors' :[{
+        'postProcessors':[{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
             'prefferedquality':'192'
@@ -44,6 +43,6 @@ def ScrapeVidId(query):
     url = f"https://www.youtube.com/results?search_query={query}"
     query = url.replace(" ","+")
     response = requests.get(url)
-    print(response.text)
+    #print(response.text)
     vid_ids = re.findall(r"watch\?v=(\S{11})",response.text)
     return vid_ids[0]

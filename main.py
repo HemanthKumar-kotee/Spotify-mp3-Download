@@ -6,6 +6,8 @@
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
+
+
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
 
@@ -24,27 +26,33 @@ from downloadSongs import DownloadFromTitles
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
+
 app.config['SESSION_COOKIE_NAME'] = 'sdmp3 cookie'
+app.secret_key = ''
 TOKEN_INFO = "token_info"
 load_dotenv()
 
 _id = os.getenv("CLIENT_ID")
 _secret = os.getenv("SECRET_KEY")
+
 @app.route('/')
 def index():
     spotify_oauth = create_spotify_oauth()
     auth_url = spotify_oauth.get_authorize_url()
+
     return redirect(auth_url)
 @app.route('/redirect')
 def redirectPage():
+
     spotifu_oauth = create_spotify_oauth()
     session.clear()
-    access_code = request.args.get('code')
-    token_info = spotifu_oauth.get_cached_token(access_code)
-    session['TOKEN_INFO'] = token_info
+    code = request.args.get('code')
 
-    return redirect(url_for('getTracks', _external= True))
-@app.route('/getTracks')
+    token_info = spotifu_oauth.get_access_token(code)
+    session[TOKEN_INFO] = token_info
+
+    return redirect(url_for('getTracks', _external=True))
+@app.route('/tracks')
 def getTracks():
     try:
         token_info = get_token()
@@ -58,11 +66,11 @@ def getTracks():
     names = list(playlistId.keys())
     for name in range(len(names)):
         print(f'{name} : {names[name]}')
-    choice = int(input(''))
+    choice = int(input('Give the corresponding number to the playlist: '))
     play = playlistId[names[choice]]
 
     songs = []
-    for song in token.playlist_items(play ,limit=50 ,offset=0):
+    for song in token.playlist_items(play,limit=50,offset=0)['items']:
         songs.append(song['track']['name'])
 
     DownloadFromTitles(songs)
@@ -72,8 +80,6 @@ def getPlaylist(token):
     playListId = {}
     for id in token.current_user_playlists(limit=50 ,offset=0)['items']:
         playListId[str(id['name'])] = str(id['id'])
-        print(playListId[str(id['name'])])
-
     return playListId
 def get_token():
     token_info = session.get(TOKEN_INFO ,None)
@@ -89,11 +95,11 @@ def get_token():
 
 def create_spotify_oauth():
     return SpotifyOAuth(
-        client_id = '930ceceacc1e487c81539ec6004f40eb',
-        client_secret = '47974613722a46b585d1c3f4d4e91348',
-        redirect_uri = url_for('redirectPage',_external = True),
-        scope = "user-library-read"
+        client_id = _id,
+        client_secret = _secret,
+        scope="user-library-read",
+        redirect_uri = url_for('redirectPage',_external = True)
     )
-if __name__ == '__main__':
+if __name__=='__main__':
 
     app.run(debug = False)
