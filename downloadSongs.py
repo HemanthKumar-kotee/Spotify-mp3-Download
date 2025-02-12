@@ -1,5 +1,5 @@
 from pathlib import Path
-import youtube_dl
+import yt_dlp
 import os
 import re
 import requests
@@ -30,10 +30,9 @@ def DownloadSongsfromId(ids):
             'preferredcodec': 'mp3',
             'prefferedquality':'192'
         }],
-
         'outtmpl' : SAVE_PATH + '/%(title)s.%(ext)s',
     }
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
             ydl.download(ids)
         except:
