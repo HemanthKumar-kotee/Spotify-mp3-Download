@@ -43,6 +43,5 @@ def ScrapeVidId(query):
     url = f"https://www.youtube.com/results?search_query={query}"
     query = url.replace(" ","+")
     response = requests.get(url)
-    #print(response.text)
     vid_ids = re.findall(r"watch\?v=(\S{11})",response.text)
     return vid_ids[0]
